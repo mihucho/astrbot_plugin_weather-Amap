@@ -43,6 +43,14 @@
 
 本插件的源码位于 [GitHub](https://github.com/BB0813/astrbot_plugin_weather-Amap)。欢迎提出 Issue 或 PR 来帮助我们改进插件。
 
+## 支持
+
+如有问题或建议，请访问：
+- [AstrBot 官方文档](https://astrbot.app)
+- [插件开发文档](https://astrbot.app/dev/star/plugin.html)
+- [开发者联系方式](https://qm.qq.com/q/nDHgJBm5Mc)
+- [插件反馈群](https://qm.qq.com/q/d4lwUp9ap4)
+
 ## 🤝 特别感谢
 
 本项目基于w33d大佬的心知天气插件二次开发: [https://github.com/Last-emo-boy/astrbot_plugin_weather](https://github.com/Last-emo-boy/astrbot_plugin_weather)
