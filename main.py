@@ -365,10 +365,10 @@ class WeatherPlugin(Star):
         # 如果指定了 day，则只返回该天的天气
         if day:
             filtered_data = [d for d in forecast_data if d['date'] == day]
-            if not filtered_data:
-                yield event.plain_result(f"未找到 [{city}] 在 {day} 的天气预报数据。")
-                return
-            forecast_data = filtered_data
+            if filtered_data:
+                forecast_data = filtered_data
+            else:
+                day = None  # 无效日期，返回全部预报
         
         if self.send_mode == "image":
             url = await self.render_forecast_weather(
@@ -384,12 +384,12 @@ class WeatherPlugin(Star):
             
             for day_item in forecast_data:
                 if day:
-                    # 指定了日期，不需要重复显示日期
+                    # 指定了日期，使用多行格式展示详细信息
                     text += (
-                        f"白天: {day_item['text_day']} - {day_item['high']}℃, "
-                        f"夜晚: {day_item['text_night']} - {day_item['low']}℃, "
-                        f"湿度: {day_item['humidity']}%, "
-                        f"风速: {day_item['wind_speed']} km/h\n\n"
+                        f"白天: {day_item['text_day']} - {day_item['high']}℃\n\n"
+                        f"夜晚: {day_item['text_night']} - {day_item['low']}℃\n\n"
+                        f"湿度: {day_item['humidity']}%\n\n"
+                        f"风速: {day_item['wind_speed']} km/h"
                     )
                 else:
                     # 未指定日期，显示完整的日期前缀
