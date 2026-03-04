@@ -376,14 +376,29 @@ class WeatherPlugin(Star):
             )
             yield event.image_result(url)
         else:
-            text = f"未来{len(forecast_data)}天天气预报\n\n城市: {city}\n\n"
+            # 根据是否指定 day 优化标题
+            if day:
+                text = f"{city} - {day} 天气预报\n\n"
+            else:
+                text = f"未来{len(forecast_data)}天天气预报\n\n城市: {city}\n\n"
+            
             for day_item in forecast_data:
-                text += (
-                    f"{day_item['date']}: 白天: {day_item['text_day']} - {day_item['high']}℃, "
-                    f"夜晚: {day_item['text_night']} - {day_item['low']}℃, "
-                    f"湿度: {day_item['humidity']}%, "
-                    f"风速: {day_item['wind_speed']} km/h\n\n"
-                )
+                if day:
+                    # 指定了日期，不需要重复显示日期
+                    text += (
+                        f"白天: {day_item['text_day']} - {day_item['high']}℃, "
+                        f"夜晚: {day_item['text_night']} - {day_item['low']}℃, "
+                        f"湿度: {day_item['humidity']}%, "
+                        f"风速: {day_item['wind_speed']} km/h\n\n"
+                    )
+                else:
+                    # 未指定日期，显示完整的日期前缀
+                    text += (
+                        f"{day_item['date']}: 白天: {day_item['text_day']} - {day_item['high']}℃, "
+                        f"夜晚: {day_item['text_night']} - {day_item['low']}℃, "
+                        f"湿度: {day_item['humidity']}%, "
+                        f"风速: {day_item['wind_speed']} km/h\n\n"
+                    )
             if suggestion_data:
                 text += "\n生活指数:\n\n"
                 for s in suggestion_data:
