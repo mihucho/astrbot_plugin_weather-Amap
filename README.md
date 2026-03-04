@@ -41,7 +41,7 @@
 
 ## 开源协议
 
-本插件的源码位于 [GitHub](https://github.com/BB0813/astrbot_plugin_weather-Amap)。欢迎提出 Issue 或 PR 来帮助我们改进插件。
+本插件的源码位于 [GitHub](https://github.com/mihucho/astrbot_plugin_weather-Amap)。欢迎提出 Issue 或 PR 来帮助我们改进插件。
 
 ## 支持
 

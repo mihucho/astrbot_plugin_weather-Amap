@@ -178,7 +178,7 @@ FORECAST_TEMPLATE = """
     "BB0813",
     "一个基于高德开放平台API的天气查询插件",
     "1.0.0",
-    "https://github.com/BB0813/astrbot_plugin_weather-Amap",
+    "https://github.com/mihucho/astrbot_plugin_weather-Amap",
 )
 class WeatherPlugin(Star):
     """
