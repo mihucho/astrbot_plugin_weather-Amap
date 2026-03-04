@@ -1,6 +1,6 @@
 name: astrbot_plugin_weather-Amap            # 这是你的插件的唯一识别名（必须唯一）
 desc: 一个基于 高德开放平台 API 的天气查询插件  # 插件简短描述
 help: 输入 /weather help 可获取插件帮助信息    # 插件的帮助信息
-version: v1.0.2                       # 插件版本号
+version: v1.0.3                      # 插件版本号
 author: BB0813                        # 作者
 repo: https://github.com/mihucho/astrbot_plugin_weather-Amap  # 插件仓库地址

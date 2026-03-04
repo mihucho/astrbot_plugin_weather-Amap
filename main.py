@@ -177,7 +177,7 @@ FORECAST_TEMPLATE = """
     "astrbot_plugin_weather-Amap",
     "BB0813",
     "一个基于高德开放平台API的天气查询插件",
-    "1.0.0",
+    "1.0.3",
     "https://github.com/mihucho/astrbot_plugin_weather-Amap",
 )
 class WeatherPlugin(Star):
@@ -343,12 +343,13 @@ class WeatherPlugin(Star):
 
     @llm_tool(name="get_forecast_weather")
     async def get_forecast_weather_tool(
-        self, event: AstrMessageEvent, city: str
+        self, event: AstrMessageEvent, city: str, day: Optional[str] = None
     ) -> MessageEventResult:
         """当用户对某个城市未来天气预报感兴趣时，用于获取天气预报信息。
 
         Args:
             city (string): 地点，例如：杭州，或者浙江杭州
+            day (string, optional): 指定日期，格式如 "2026-03-05"，如果不提供则返回所有预报天数
         """
         if not city:
             city = self.default_city
@@ -358,6 +359,17 @@ class WeatherPlugin(Star):
             yield event.plain_result(f"查询 [{city}] 天气失败，请稍后再试。")
             return
         
+        # 存储 forecast_data 到 KV
+        await self.put_kv_data(f"{city}_forecast", forecast_data)
+        
+        # 如果指定了 day，则只返回该天的天气
+        if day:
+            filtered_data = [d for d in forecast_data if d['date'] == day]
+            if not filtered_data:
+                yield event.plain_result(f"未找到 [{city}] 在 {day} 的天气预报数据。")
+                return
+            forecast_data = filtered_data
+        
         if self.send_mode == "image":
             url = await self.render_forecast_weather(
                 city, forecast_data, suggestion_data
@@ -365,12 +377,12 @@ class WeatherPlugin(Star):
             yield event.image_result(url)
         else:
             text = f"未来{len(forecast_data)}天天气预报\n\n城市: {city}\n\n"
-            for day in forecast_data:
+            for day_item in forecast_data:
                 text += (
-                    f"{day['date']}: 白天: {day['text_day']} - {day['high']}℃, "
-                    f"夜晚: {day['text_night']} - {day['low']}℃, "
-                    f"湿度: {day['humidity']}%, "
-                    f"风速: {day['wind_speed']} km/h\n\n"
+                    f"{day_item['date']}: 白天: {day_item['text_day']} - {day_item['high']}℃, "
+                    f"夜晚: {day_item['text_night']} - {day_item['low']}℃, "
+                    f"湿度: {day_item['humidity']}%, "
+                    f"风速: {day_item['wind_speed']} km/h\n\n"
                 )
             if suggestion_data:
                 text += "\n生活指数:\n\n"
