@@ -4,9 +4,14 @@ from typing import Optional, List, Dict
 import traceback
 
 from astrbot.api.all import (
-    Star, Context, register,
-    AstrMessageEvent, command_group, command,
-    MessageEventResult, llm_tool
+    Star,
+    Context,
+    register,
+    AstrMessageEvent,
+    command_group,
+    command,
+    MessageEventResult,
+    llm_tool,
 )
 from astrbot.api.event import filter
 from astrbot.api import logger
@@ -167,12 +172,13 @@ FORECAST_TEMPLATE = """
 </html>
 """
 
+
 @register(
     "astrbot_plugin_weather-Amap",
     "BB0813",
     "一个基于高德开放平台API的天气查询插件",
     "1.0.0",
-    "https://github.com/BB0813/astrbot_plugin_weather-Amap"
+    "https://github.com/BB0813/astrbot_plugin_weather-Amap",
 )
 class WeatherPlugin(Star):
     """
@@ -181,6 +187,7 @@ class WeatherPlugin(Star):
     - current: 查询当前实况
     - forecast: 查询未来4天天气预报
     """
+
     def __init__(self, context: Context, config: dict):
         super().__init__(context)
         self.config = config
@@ -189,7 +196,9 @@ class WeatherPlugin(Star):
         self.default_city = config.get("default_city", "北京")
         # 新增配置项：send_mode，控制发送模式 "image" 或 "text"
         self.send_mode = config.get("send_mode", "image")
-        logger.debug(f"WeatherPlugin initialized with API key: {self.api_key}, default_city: {self.default_city}, send_mode: {self.send_mode}")
+        logger.debug(
+            f"WeatherPlugin initialized with API key: {self.api_key}, default_city: {self.default_city}, send_mode: {self.send_mode}"
+        )
 
     # =============================
     # 命令组 "weather"
@@ -205,7 +214,9 @@ class WeatherPlugin(Star):
         pass
 
     @weather_group.command("current")
-    async def weather_current(self, event: AstrMessageEvent, city: Optional[str] = None):
+    async def weather_current(
+        self, event: AstrMessageEvent, city: Optional[str] = None
+    ):
         """
         查看当前实况天气
         用法: /weather current <城市>
@@ -215,7 +226,9 @@ class WeatherPlugin(Star):
         if not city:
             city = self.default_city
         if not self.api_key:
-            yield event.plain_result("未配置 Amap API Key，无法查询天气。请在管理面板中配置后再试。")
+            yield event.plain_result(
+                "未配置 Amap API Key，无法查询天气。请在管理面板中配置后再试。"
+            )
             return
         data = await self.get_current_weather_by_city(city)
         if data is None:
@@ -237,7 +250,9 @@ class WeatherPlugin(Star):
             yield event.plain_result(text)
 
     @weather_group.command("forecast")
-    async def weather_forecast(self, event: AstrMessageEvent, city: Optional[str] = None):
+    async def weather_forecast(
+        self, event: AstrMessageEvent, city: Optional[str] = None
+    ):
         """
         查看未来4天天气预报
         用法: /weather forecast <城市>
@@ -247,7 +262,9 @@ class WeatherPlugin(Star):
         if not city:
             city = self.default_city
         if not self.api_key:
-            yield event.plain_result("未配置 Amap API Key，无法查询天气。请在管理面板中配置后再试。")
+            yield event.plain_result(
+                "未配置 Amap API Key，无法查询天气。请在管理面板中配置后再试。"
+            )
             return
         forecast_data = await self.get_forecast_weather_by_city(city)
         if forecast_data is None:
@@ -257,9 +274,7 @@ class WeatherPlugin(Star):
         # 根据配置决定发送模式
         if self.send_mode == "image":
             forecast_img_url = await self.render_forecast_weather(
-                city,
-                days_data=forecast_data,
-                suggestions=suggestion_data
+                city, days_data=forecast_data, suggestions=suggestion_data
             )
             yield event.image_result(forecast_img_url)
         else:
@@ -296,64 +311,73 @@ class WeatherPlugin(Star):
     # LLM Function-Calling (可选)
     # =============================
     @llm_tool(name="get_current_weather")
-    async def get_current_weather_tool(self, event: AstrMessageEvent, city: str) -> MessageEventResult:
-        '''当用户对某个城市的天气情况感兴趣时，用于获取当前天气信息。
+    async def get_current_weather_tool(
+        self, event: AstrMessageEvent, city: str
+    ) -> MessageEventResult:
+        """当用户对某个城市的天气情况感兴趣时，用于获取当前天气信息。
 
         Args:
             city (string): 地点，例如：杭州，或者浙江杭州
-        '''
+        """
         if not city:
             city = self.default_city
         data = await self.get_current_weather_by_city(city)
         if not data:
             yield event.plain_result(f"查询 [{city}] 天气失败，请稍后再试。")
-            return
+            return f"查询 [{city}] 天气失败，请稍后再试。"
+        text = (
+            f"当前天气：\n"
+            f"城市: {data['city']}\n"
+            f"天气: {data['desc']}\n"
+            f"温度: {data['temp']}℃\n"
+            f"湿度: {data['humidity']}%\n"
+            f"风速: {data['wind_speed']} km/h"
+        )
         if self.send_mode == "image":
             url = await self.render_current_weather(data)
             yield event.image_result(url)
         else:
-            text = (
-                f"当前天气：\n"
-                f"城市: {data['city']}\n"
-                f"天气: {data['desc']}\n"
-                f"温度: {data['temp']}℃\n"
-                f"湿度: {data['humidity']}%\n"
-                f"风速: {data['wind_speed']} km/h"
-            )
             yield event.plain_result(text)
+        # 增加返回值，方便在工具调用场景中使用
+        return text
 
     @llm_tool(name="get_forecast_weather")
-    async def get_forecast_weather_tool(self, event: AstrMessageEvent, city: str) -> MessageEventResult:
-        '''当用户对某个城市未来天气预报感兴趣时，用于获取天气预报信息。
+    async def get_forecast_weather_tool(
+        self, event: AstrMessageEvent, city: str
+    ) -> MessageEventResult:
+        """当用户对某个城市未来天气预报感兴趣时，用于获取天气预报信息。
 
         Args:
             city (string): 地点，例如：杭州，或者浙江杭州
-        '''
+        """
         if not city:
             city = self.default_city
         forecast_data = await self.get_forecast_weather_by_city(city)
         suggestion_data = await self.get_life_suggestion_by_city(city)
         if not forecast_data:
             yield event.plain_result(f"查询 [{city}] 天气失败，请稍后再试。")
-            return
+            return f"查询 [{city}] 天气失败，请稍后再试。"
+        text = f"未来{len(forecast_data)}天天气预报\n城市: {city}\n"
+        for day in forecast_data:
+            text += (
+                f"{day['date']}: 白天: {day['text_day']} - {day['high']}℃, "
+                f"夜晚: {day['text_night']} - {day['low']}℃, "
+                f"湿度: {day['humidity']}%, "
+                f"风速: {day['wind_speed']} km/h\n"
+            )
+        if suggestion_data:
+            text += "生活指数:\n"
+            for s in suggestion_data:
+                text += f"{s['name']}: {s['brief']}\n"
         if self.send_mode == "image":
-            url = await self.render_forecast_weather(city, forecast_data, suggestion_data)
+            url = await self.render_forecast_weather(
+                city, forecast_data, suggestion_data
+            )
             yield event.image_result(url)
         else:
-            text = f"未来{len(forecast_data)}天天气预报\n城市: {city}\n"
-            for day in forecast_data:
-                text += (
-                    f"{day['date']}: 白天: {day['text_day']} - {day['high']}℃, "
-                    f"夜晚: {day['text_night']} - {day['low']}℃, "
-                    f"湿度: {day['humidity']}%, "
-                    f"风速: {day['wind_speed']} km/h\n"
-                )
-            if suggestion_data:
-                text += "生活指数:\n"
-                for s in suggestion_data:
-                    text += f"{s['name']}: {s['brief']}\n"
-
             yield event.plain_result(text)
+        # 增加返回值，方便在工具调用场景中使用
+        return text
 
     # =============================
     # 核心逻辑
@@ -364,11 +388,7 @@ class WeatherPlugin(Star):
         """
         logger.debug(f"get_current_weather_by_city city={city}")
         url = "https://restapi.amap.com/v3/weather/weatherInfo"
-        params = {
-            "key": self.api_key,
-            "city": city,
-            "extensions": "base"
-        }
+        params = {"key": self.api_key, "city": city, "extensions": "base"}
         logger.debug(f"Requesting: {url}, params={params}")
         try:
             async with aiohttp.ClientSession() as session:
@@ -390,11 +410,13 @@ class WeatherPlugin(Star):
                             "desc": desc,
                             "temp": temp,
                             "humidity": humidity,
-                            "wind_speed": wind_speed
+                            "wind_speed": wind_speed,
                         }
 
                     else:
-                        logger.error(f"get_current_weather_by_city status={resp.status}")
+                        logger.error(
+                            f"get_current_weather_by_city status={resp.status}"
+                        )
                         return None
         except Exception as e:
             logger.error(f"get_current_weather_by_city error: {e}")
@@ -407,11 +429,7 @@ class WeatherPlugin(Star):
         """
         logger.debug(f"get_forecast_weather_by_city city={city}")
         url = "https://restapi.amap.com/v3/weather/weatherInfo"
-        params = {
-            "key": self.api_key,
-            "city": city,
-            "extensions": "all"
-        }
+        params = {"key": self.api_key, "city": city, "extensions": "all"}
         logger.debug(f"Requesting forecast: {url}, params={params}")
         try:
             async with aiohttp.ClientSession() as session:
@@ -436,18 +454,22 @@ class WeatherPlugin(Star):
                             low = day_data.get("nighttemp", "0")
                             humidity = day_data.get("humidity", "0")
                             wind_speed = day_data.get("daypower", "0")
-                            result.append({
-                                "date": date,
-                                "text_day": text_day,
-                                "text_night": text_night,
-                                "high": high,
-                                "low": low,
-                                "humidity": humidity,
-                                "wind_speed": wind_speed
-                            })
+                            result.append(
+                                {
+                                    "date": date,
+                                    "text_day": text_day,
+                                    "text_night": text_night,
+                                    "high": high,
+                                    "low": low,
+                                    "humidity": humidity,
+                                    "wind_speed": wind_speed,
+                                }
+                            )
                         return result
                     else:
-                        logger.error(f"get_forecast_weather_by_city status={resp.status}")
+                        logger.error(
+                            f"get_forecast_weather_by_city status={resp.status}"
+                        )
                         return None
         except Exception as e:
             logger.error(f"get_forecast_weather_by_city error: {e}")
@@ -474,25 +496,29 @@ class WeatherPlugin(Star):
                 "desc": data["desc"],
                 "temp": data["temp"],
                 "humidity": data["humidity"],
-                "wind_speed": data["wind_speed"]
+                "wind_speed": data["wind_speed"],
             },
-            return_url=True
+            return_url=True,
         )
         return url
 
-    async def render_forecast_weather(self, city: str, days_data: List[dict], suggestions: Optional[List[dict]] = None) -> str:
+    async def render_forecast_weather(
+        self, city: str, days_data: List[dict], suggestions: Optional[List[dict]] = None
+    ) -> str:
         """
         渲染未来4天天气预报图文信息
         """
-        logger.debug(f"render_forecast_weather for city={city}, days={days_data}, suggestions={suggestions}")
+        logger.debug(
+            f"render_forecast_weather for city={city}, days={days_data}, suggestions={suggestions}"
+        )
         url = await self.html_render(
             FORECAST_TEMPLATE,
             {
                 "city": city,
                 "days": days_data,
                 "total_days": len(days_data),
-                "suggestions": suggestions or []
+                "suggestions": suggestions or [],
             },
-            return_url=True
+            return_url=True,
         )
         return url
