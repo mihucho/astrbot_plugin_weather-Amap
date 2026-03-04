@@ -247,7 +247,7 @@ class WeatherPlugin(Star):
                 f"湿度: {data['humidity']}%\n\n"
                 f"风速: {data['wind_speed']} km/h"
             )
-            return text
+            yield event.plain_result(text)
 
     @weather_group.command("forecast")
     async def weather_forecast(
@@ -291,7 +291,7 @@ class WeatherPlugin(Star):
                 text += "生活指数:\n"
                 for s in suggestion_data:
                     text += f"{s['name']}: {s['brief']}\n"
-            return text
+            yield event.plain_result(text)
 
     @weather_group.command("help")
     async def weather_help(self, event: AstrMessageEvent):
