@@ -339,8 +339,7 @@ class WeatherPlugin(Star):
                 f"湿度: {data['humidity']}%\n\n"
                 f"风速: {data['wind_speed']} km/h"
             )
-            # 增加返回值，方便在工具调用场景中使用
-            return text
+            yield event.plain_result(text)
 
     @llm_tool(name="get_forecast_weather")
     async def get_forecast_weather_tool(
@@ -377,8 +376,7 @@ class WeatherPlugin(Star):
                 text += "\n生活指数:\n\n"
                 for s in suggestion_data:
                     text += f"{s['name']}: {s['brief']}\n\n"
-            # 增加返回值，方便在工具调用场景中使用
-            return text
+            yield event.plain_result(text)
 
     # =============================
     # 核心逻辑
