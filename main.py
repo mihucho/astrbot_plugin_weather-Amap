@@ -386,16 +386,16 @@ class WeatherPlugin(Star):
                 if day:
                     # 指定了日期，使用多行格式展示详细信息
                     text += (
-                        f"白天: {day_item['text_day']} - {day_item['high']}℃\n\n"
-                        f"夜晚: {day_item['text_night']} - {day_item['low']}℃\n\n"
+                        f"白天: {day_item['text_day']}  {day_item['high']}℃\n\n"
+                        f"夜晚: {day_item['text_night']}  {day_item['low']}℃\n\n"
                         f"湿度: {day_item['humidity']}%\n\n"
                         f"风速: {day_item['wind_speed']} km/h"
                     )
                 else:
                     # 未指定日期，显示完整的日期前缀
                     text += (
-                        f"{day_item['date']}: 白天: {day_item['text_day']} - {day_item['high']}℃, "
-                        f"夜晚: {day_item['text_night']} - {day_item['low']}℃, "
+                        f"{day_item['date']}: 白天: {day_item['text_day']}  {day_item['high']}℃, "
+                        f"夜晚: {day_item['text_night']}  {day_item['low']}℃, "
                         f"湿度: {day_item['humidity']}%, "
                         f"风速: {day_item['wind_speed']} km/h\n\n"
                     )
