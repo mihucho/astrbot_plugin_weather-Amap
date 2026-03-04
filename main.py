@@ -229,27 +229,25 @@ class WeatherPlugin(Star):
             yield event.plain_result(
                 "未配置 Amap API Key，无法查询天气。请在管理面板中配置后再试。"
             )
-            return "未配置 Amap API Key，无法查询天气。请在管理面板中配置后再试。"
+            return
         data = await self.get_current_weather_by_city(city)
         if data is None:
             yield event.plain_result(f"查询 [{city}] 的当前天气失败，请稍后再试。")
-            return f"查询 [{city}] 的当前天气失败，请稍后再试。"
-        
-        text = (
-            f"当前天气：\n\n"
-            f"城市: {data['city']}\n\n"
-            f"天气: {data['desc']}\n\n"
-            f"温度: {data['temp']}℃\n\n"
-            f"湿度: {data['humidity']}%\n\n"
-            f"风速: {data['wind_speed']} km/h"
-        )
+            return
         # 根据配置决定发送模式
         if self.send_mode == "image":
             result_img_url = await self.render_current_weather(data)
             yield event.image_result(result_img_url)
         else:
-            yield event.plain_result(text)
-        return text
+            text = (
+                f"当前天气：\n\n"
+                f"城市: {data['city']}\n\n"
+                f"天气: {data['desc']}\n\n"
+                f"温度: {data['temp']}℃\n\n"
+                f"湿度: {data['humidity']}%\n\n"
+                f"风速: {data['wind_speed']} km/h"
+            )
+            return text
 
     @weather_group.command("forecast")
     async def weather_forecast(
@@ -267,24 +265,13 @@ class WeatherPlugin(Star):
             yield event.plain_result(
                 "未配置 Amap API Key，无法查询天气。请在管理面板中配置后再试。"
             )
-            return "未配置 Amap API Key，无法查询天气。请在管理面板中配置后再试。"
+            return
         forecast_data = await self.get_forecast_weather_by_city(city)
         if forecast_data is None:
             yield event.plain_result(f"查询 [{city}] 的未来天气失败，请稍后再试。")
-            return f"查询 [{city}] 的未来天气失败，请稍后再试。"
+            return
         suggestion_data = await self.get_life_suggestion_by_city(city)
-        text = f"未来{len(forecast_data)}天天气预报\n\n城市: {city}\n\n"
-        for day in forecast_data:
-            text += (
-                f"{day['date']}: 白天: {day['text_day']} - {day['high']}℃, "
-                f"夜晚: {day['text_night']} - {day['low']}℃, "
-                f"湿度: {day['humidity']}%, "
-                f"风速: {day['wind_speed']} km/h\n\n"
-            )
-        if suggestion_data:
-            text += "生活指数:\n"
-            for s in suggestion_data:
-                text += f"{s['name']}: {s['brief']}\n"
+
         # 根据配置决定发送模式
         if self.send_mode == "image":
             forecast_img_url = await self.render_forecast_weather(
@@ -292,9 +279,20 @@ class WeatherPlugin(Star):
             )
             yield event.image_result(forecast_img_url)
         else:
-            yield event.plain_result(text)
-        return text
-    
+            text = f"未来{len(forecast_data)}天天气预报\n\n城市: {city}\n\n"
+            for day in forecast_data:
+                text += (
+                    f"{day['date']}: 白天: {day['text_day']} - {day['high']}℃, "
+                    f"夜晚: {day['text_night']} - {day['low']}℃, "
+                    f"湿度: {day['humidity']}%, "
+                    f"风速: {day['wind_speed']} km/h\n\n"
+                )
+            if suggestion_data:
+                text += "生活指数:\n"
+                for s in suggestion_data:
+                    text += f"{s['name']}: {s['brief']}\n"
+            return text
+
     @weather_group.command("help")
     async def weather_help(self, event: AstrMessageEvent):
         """
@@ -327,22 +325,22 @@ class WeatherPlugin(Star):
         data = await self.get_current_weather_by_city(city)
         if not data:
             yield event.plain_result(f"查询 [{city}] 天气失败，请稍后再试。")
-            return f"查询 [{city}] 天气失败，请稍后再试。"
-        text = (
-            f"当前天气：\n\n"
-            f"城市: {data['city']}\n\n"
-            f"天气: {data['desc']}\n\n"
-            f"温度: {data['temp']}℃\n\n"
-            f"湿度: {data['humidity']}%\n\n"
-            f"风速: {data['wind_speed']} km/h"
-        )
+            return
+
         if self.send_mode == "image":
             url = await self.render_current_weather(data)
             yield event.image_result(url)
         else:
-            yield event.plain_result(text)
-        # 增加返回值，方便在工具调用场景中使用
-        return text
+            text = (
+                f"当前天气：\n\n"
+                f"城市: {data['city']}\n\n"
+                f"天气: {data['desc']}\n\n"
+                f"温度: {data['temp']}℃\n\n"
+                f"湿度: {data['humidity']}%\n\n"
+                f"风速: {data['wind_speed']} km/h"
+            )
+            # 增加返回值，方便在工具调用场景中使用
+            return text
 
     @llm_tool(name="get_forecast_weather")
     async def get_forecast_weather_tool(
@@ -359,28 +357,28 @@ class WeatherPlugin(Star):
         suggestion_data = await self.get_life_suggestion_by_city(city)
         if not forecast_data:
             yield event.plain_result(f"查询 [{city}] 天气失败，请稍后再试。")
-            return f"查询 [{city}] 天气失败，请稍后再试。"
-        text = f"未来{len(forecast_data)}天天气预报\n\n城市: {city}\n\n"
-        for day in forecast_data:
-            text += (
-                f"{day['date']}: 白天: {day['text_day']} - {day['high']}℃, "
-                f"夜晚: {day['text_night']} - {day['low']}℃, "
-                f"湿度: {day['humidity']}%, "
-                f"风速: {day['wind_speed']} km/h\n\n"
-            )
-        if suggestion_data:
-            text += "\n生活指数:\n\n"
-            for s in suggestion_data:
-                text += f"{s['name']}: {s['brief']}\n\n"
+            return
+        
         if self.send_mode == "image":
             url = await self.render_forecast_weather(
                 city, forecast_data, suggestion_data
             )
             yield event.image_result(url)
         else:
-            yield event.plain_result(text)
-        # 增加返回值，方便在工具调用场景中使用
-        return text
+            text = f"未来{len(forecast_data)}天天气预报\n\n城市: {city}\n\n"
+            for day in forecast_data:
+                text += (
+                    f"{day['date']}: 白天: {day['text_day']} - {day['high']}℃, "
+                    f"夜晚: {day['text_night']} - {day['low']}℃, "
+                    f"湿度: {day['humidity']}%, "
+                    f"风速: {day['wind_speed']} km/h\n\n"
+                )
+            if suggestion_data:
+                text += "\n生活指数:\n\n"
+                for s in suggestion_data:
+                    text += f"{s['name']}: {s['brief']}\n\n"
+            # 增加返回值，方便在工具调用场景中使用
+            return text
 
     # =============================
     # 核心逻辑
