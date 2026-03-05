@@ -15,6 +15,7 @@ from astrbot.api.all import (
 )
 from astrbot.api.event import filter
 from astrbot.api import logger
+from astrbot.core.utils.io import download_image_by_url, file_to_base64
 
 # ==============================
 # 1) HTML 模板
@@ -526,7 +527,10 @@ class WeatherPlugin(Star):
             },
             return_url=True,
         )
-        return url
+        # 下载图片并转换为base64
+        img_bytes = await download_image_by_url(url)
+        base64_str = file_to_base64(img_bytes)
+        return base64_str
 
     async def render_forecast_weather(
         self, city: str, days_data: List[dict], suggestions: Optional[List[dict]] = None
@@ -547,4 +551,7 @@ class WeatherPlugin(Star):
             },
             return_url=True,
         )
-        return url
+        # 下载图片并转换为base64
+        img_bytes = await download_image_by_url(url)
+        base64_str = file_to_base64(img_bytes)
+        return base64_str
