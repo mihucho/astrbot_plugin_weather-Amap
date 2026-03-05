@@ -238,7 +238,7 @@ FORECAST_TEMPLATE = """
       --accent-block: #e9e9e4;
       --text-main: #1a1a1a;
       --text-dim: #999990;
-      --theme-blue: #6d7fb3;    /* 雾霾蓝 */
+      --theme-blue: #6d7fb3;
       --night-deep: #3a3f4b;    
     }
 
@@ -253,7 +253,7 @@ FORECAST_TEMPLATE = """
 
     .container { width: 1280px; height: 720px; display: flex; box-sizing: border-box; }
 
-    /* --- 左侧封面 (100% 还原) --- */
+    /* --- 左侧封面 --- */
     .hero-panel {
       flex: 0.4; padding: 80px; display: flex; flex-direction: column;
       justify-content: space-between; border-right: 1px solid rgba(0,0,0,0.05);
@@ -265,42 +265,53 @@ FORECAST_TEMPLATE = """
     /* --- 右侧数据面板 --- */
     .data-panel { flex: 0.6; display: flex; flex-direction: column; background: var(--accent-block); }
 
-    /* --- 多日列表：左右镜像结构 --- */
+    /* --- 多日列表：大而轻盈的日期结构 --- */
     .day-row {
       flex: 1; display: flex; align-items: center; justify-content: space-between;
-      padding: 0 40px; background: #fff; margin-bottom: 2px;
+      padding: 0 45px; background: #fff; margin-bottom: 2px;
     }
     .day-row:nth-child(even) { background: #fafafa; }
 
-    /* 白天部分：左对齐 */
-    .day-part {
-      flex: 1; display: flex; flex-direction: column; align-items: flex-start;
-    }
-    .day-part .temp { font-size: 52px; font-weight: 100; color: var(--theme-blue); line-height: 1; }
-    .day-part .desc { font-size: 24px; font-weight: 800; color: var(--theme-blue); margin-top: 5px; }
-    .day-part .wind { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+    /* 白天 */
+    .day-part { flex: 1; display: flex; flex-direction: column; align-items: flex-start; }
+    .day-part .temp { font-size: 56px; font-weight: 100; color: var(--theme-blue); line-height: 0.9; }
+    .day-part .desc { font-size: 24px; font-weight: 800; color: var(--theme-blue); margin-top: 8px; }
+    .day-part .wind { font-size: 12px; color: var(--text-dim); text-transform: uppercase; margin-top: 2px; }
 
-    /* 中间日期：中轴线 */
+    /* 中间日期：优化后的“通透大字” (48px) */
     .date-mid {
-      flex: 0.5; display: flex; flex-direction: column; align-items: center;height: 70%; justify-content: center;
+      flex: 0.8; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 0 20px;
     }
-    .date-text { font-size: 36px; font-weight: 900; color: var(--text-main); letter-spacing: -1px; }
-    .week-text { font-size: 12px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; margin-top: 4px; }
-
-    /* 夜晚部分：右对齐 */
-    .night-part {
-      flex: 1; display: flex; flex-direction: column; align-items: flex-end;
-      text-align: right;
+    .date-text { 
+      font-size: 56px; 
+      font-weight: 900; 
+      color: rgba(0,0,0,0.6); /* 使用极浅的颜色，保证大而不突兀 */
+      letter-spacing: -2px;
+      line-height: 0.9;
     }
-    .night-part .temp { font-size: 42px; font-weight: 400; color: var(--text-main); line-height: 1; }
-    .night-part .desc { font-size: 22px; font-weight: 700; color: var(--text-main); margin-top: 5px; }
-    .night-part .wind { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+    .week-text { 
+      font-size: 20px; 
+      letter-spacing: 6px; 
+      color: var(--text-dim); 
+      font-weight: 700; 
+      text-transform: uppercase; 
+      margin-top: 8px;
+    }
 
-    /* --- 单日模式 (维持海报风格) --- */
+    /* 夜晚 */
+    .night-part { flex: 1; display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+    .night-part .temp { font-size: 48px; font-weight: 400; color: var(--text-main); line-height: 0.9; }
+    .night-part .desc { font-size: 22px; font-weight: 700; color: var(--text-main); margin-top: 8px; }
+    .night-part .wind { font-size: 12px; color: var(--text-dim); text-transform: uppercase; margin-top: 2px; }
+
+    /* --- 单日模式 (补全风力) --- */
     .single-wrapper { flex: 1; display: flex; gap: 2px; }
     .period-box { flex: 1; padding: 60px 45px; display: flex; flex-direction: column; justify-content: space-between; }
-    .day-box { background: #fff; border-top: 10px solid var(--theme-blue); }
+    .day-box { background: #fff; }
     .night-box { background: var(--night-deep); color: #fff; }
+    .temp-big { font-size: 180px; font-weight: 100; line-height: 0.8; margin-top: 20px; }
+    .bottom-info { font-size: 14px; letter-spacing: 3px; opacity: 0.5; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 15px; margin-top: 20px; text-transform: uppercase;}
 
     .footer-stamp { position: absolute; bottom: 40px; left: 80px; font-size: 11px; color: var(--text-dim); letter-spacing: 2px; }
   </style>
@@ -328,16 +339,18 @@ FORECAST_TEMPLATE = """
               <div style="width:40px;height:40px;border:2.5px solid var(--theme-blue);border-radius:50%;margin-bottom:25px;"></div>
               <span style="font-size:36px;font-weight:800;color:var(--theme-blue);">DAYTIME</span>
               <div style="font-size:32px;font-weight:700;margin-top:10px;">{{ d.text_day }}</div>
+              <div class="temp-big" style="color:var(--theme-blue);">{{ d.high }}°</div>
             </div>
-            <div><div style="font-size:180px;font-weight:100;color:var(--theme-blue);">{{ d.high }}°</div></div>
+            <div class="bottom-info" style="color: var(--text-main);">Wind Velocity / {{ d.day_wind }} {{ d.day_power }}级</div>
           </div>
           <div class="period-box night-box">
             <div>
               <div style="width:40px;height:40px;border-radius:50%;box-shadow:8px 8px 0 0 #fff;margin-bottom:25px;"></div>
               <span style="font-size:36px;font-weight:800;opacity:0.7;">NIGHTFALL</span>
               <div style="font-size:32px;font-weight:700;margin-top:10px;">{{ d.text_night }}</div>
+              <div class="temp-big">{{ d.low }}°</div>
             </div>
-            <div><div style="font-size:180px;font-weight:100;">{{ d.low }}°</div></div>
+            <div class="bottom-info">Atmospheric / {{ d.night_wind }} {{ d.night_power }}级</div>
           </div>
         </div>
       {% else %}
