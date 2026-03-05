@@ -668,7 +668,7 @@ class WeatherPlugin(Star):
         
         # 检查缓存
         cache_key = f"{city}_current"
-        cached = await self.get_kv_data(cache_key)
+        cached = await self.get_kv_data(cache_key, None)
         
         if cached and isinstance(cached, dict) and "time" in cached and "data" in cached:
             # 检查缓存是否过期
@@ -731,7 +731,7 @@ class WeatherPlugin(Star):
         
         # 检查缓存
         cache_key = f"{city}_forecast"
-        cached = await self.get_kv_data(cache_key)
+        cached = await self.get_kv_data(cache_key, None)
         
         if cached and isinstance(cached, dict) and "time" in cached and "data" in cached:
             # 检查缓存是否过期
