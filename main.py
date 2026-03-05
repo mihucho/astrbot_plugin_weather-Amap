@@ -175,7 +175,7 @@ FORECAST_TEMPLATE = """
 
 
 @register(
-    "astrbot_plugin_weather-Amap",
+    "astrbot_plugin_weather-Amap-mihuc",
     "BB0813",
     "一个基于高德开放平台API的天气查询插件",
     "1.0.3",
