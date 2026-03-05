@@ -39,11 +39,12 @@ CURRENT_WEATHER_TEMPLATE = """
       width: 1280px; height: 720px;
       background-color: var(--bg-warm);
       color: var(--text-main);
-      /* 全局衬线体风格 */
-      font-family: "Georgia", "Times New Roman", "STSong", "Noto Serif SC", "SimSun", serif;
+      /* 全局字体：保留系统现代字体作为基础，仅在需要处特殊指定 */
+      font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", sans-serif;
       overflow: hidden;
     }
 
+    /* 右侧背景装饰色块 - 还原原始比例 */
     .color-block {
       position: absolute;
       right: 0; top: 0;
@@ -60,6 +61,7 @@ CURRENT_WEATHER_TEMPLATE = """
       box-sizing: border-box;
     }
 
+    /* 左侧：纯净排版区 - 还原原始 Padding */
     .left-section {
       flex: 1.2;
       padding: 80px 100px;
@@ -69,9 +71,10 @@ CURRENT_WEATHER_TEMPLATE = """
     }
 
     .brand-header {
-      font-size: 16px;
+      font-size: 13px;
       font-weight: 700;
-      letter-spacing: 6px;
+      letter-spacing: 8px;
+      text-transform: uppercase;
       color: var(--text-dim);
       /* 中文主导 */
       font-family: "STSong", "Noto Serif SC", serif;
@@ -81,22 +84,22 @@ CURRENT_WEATHER_TEMPLATE = """
       margin-top: 60px;
     }
 
-    /* 【核心修改】飘逸的书法字体 */
+    /* 【核心修改：仅字体】城市名改为书法体，间距还原为原本的 -10px */
     .city-hero h1 {
       font-size: 180px;
-      font-weight: 400;
-      line-height: 1;
+      font-weight: 900;
+      line-height: 0.8;
       margin: 0;
-      letter-spacing: 15px;
-      font-family: "Ma Shan Zheng", "STKaiti", "Kaiti", "Microsoft KaiTi", cursive, serif;
+      letter-spacing: -10px;
+      font-family: "Ma Shan Zheng", "STKaiti", "Kaiti", cursive;
     }
 
     .province-tag {
       font-size: 26px;
-      font-weight: 400;
+      font-weight: 300;
       color: var(--text-dim);
-      margin-top: 20px;
-      letter-spacing: 8px;
+      margin-top: 30px;
+      letter-spacing: 6px;
     }
 
     .footer-metadata {
@@ -115,14 +118,16 @@ CURRENT_WEATHER_TEMPLATE = """
       font-size: 14px;
       color: var(--text-dim);
       letter-spacing: 2px;
+      text-transform: uppercase;
     }
 
+    /* 右侧：卡片区 - 还原原始尺寸 */
     .right-section {
       flex: 0.8;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding-right: 120px;
+      padding-right: 140px;
     }
 
     .weather-card {
@@ -133,9 +138,10 @@ CURRENT_WEATHER_TEMPLATE = """
       position: relative;
     }
 
+    /* 还原原始数字字体风格 */
     .temp-value {
       font-size: 240px;
-      font-weight: 400;
+      font-weight: 100;
       line-height: 0.8;
       margin-left: -12px;
       display: flex;
@@ -149,31 +155,30 @@ CURRENT_WEATHER_TEMPLATE = """
     }
 
     .weather-desc {
-      font-size: 52px;
-      font-weight: 900;
+      font-size: 48px;
+      font-weight: 800;
       color: var(--theme-blue);
-      margin: 30px 0 50px 0;
-      letter-spacing: 4px;
+      margin: 20px 0 50px 0;
     }
 
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 40px;
-      border-top: 1px dotted #ccc; /* 改为虚线更显精致 */
+      border-top: 1px solid #f0f0f0; /* 还原实线 */
       padding-top: 40px;
     }
 
     .stat-label {
-      font-size: 13px;
-      letter-spacing: 2px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
       color: var(--text-dim);
-      margin-bottom: 12px;
-      font-weight: 600;
+      margin-bottom: 10px;
     }
 
     .stat-val {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 600;
       font-family: "Georgia", "STSong", serif;
     }
@@ -184,7 +189,7 @@ CURRENT_WEATHER_TEMPLATE = """
 
   <div class="container">
     <div class="left-section">
-      <div class="brand-header">气象监测系统 / WEATHER INTEL</div>
+      <div class="brand-header">Weather Intelligence</div>
       
       <div class="city-hero">
         <h1>{{ city }}</h1>
@@ -194,9 +199,10 @@ CURRENT_WEATHER_TEMPLATE = """
       <div class="footer-metadata">
         <div class="line-deco"></div>
         <div class="update-time">
-          最后更新时间 / DATA SRC<br>
-          <span style="color: var(--text-main); font-weight: 600; font-family: 'Georgia';">{{ report_time }} (AMAP)</span>
+          最后更新时间 / Last Updated<br>
+          <span style="color: var(--text-main); font-weight: 600;">{{ report_time }}</span>
         </div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 5px;">数据来源: AMAP API</div>
       </div>
     </div>
 
