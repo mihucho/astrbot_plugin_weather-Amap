@@ -26,68 +26,202 @@ CURRENT_WEATHER_TEMPLATE = """
 <head>
   <meta charset="UTF-8"/>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 1280px; /* 确保匹配 render 预设的图片尺寸 */
-      height: 720px;
-      background-color: #fff;
+    :root {
+      --bg-warm: #f2f2ee;       /* 柔砂色 */
+      --accent-block: #e9e9e4;  /* 灰泥色 */
+      --text-main: #1a1a1a;
+      --text-dim: #999990;
+      --theme-blue: #4e6ef2;    
     }
-    .weather-container {
-      width: 100%;
-      height: 100%;
-      padding: 8px;
+
+    html, body {
+      margin: 0; padding: 0;
+      width: 1280px; height: 720px;
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", sans-serif;
+      overflow: hidden;
+    }
+
+    /* 右侧背景装饰色块 */
+    .color-block {
+      position: absolute;
+      right: 0; top: 0;
+      width: 42%; height: 100%;
+      background-color: var(--accent-block);
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%; height: 100%;
+      display: flex;
+      box-sizing: border-box;
+    }
+
+    /* 左侧：纯净排版区 */
+    .left-section {
+      flex: 1.2;
+      padding: 80px 100px;
       display: flex;
       flex-direction: column;
-      justify-content: center; /* 垂直居中 */
-      align-items: center; /* 水平居中 */
-      background-color: #ffffff;
-      color: #333;
-      font-family: sans-serif;
-      font-size: 30px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      justify-content: space-between; /* 强制页眉页脚分离 */
     }
-    .weather-container h2 {
-      margin-top: 0;
-      color: #4e6ef2;
-      text-align: center;
-      font-size: 40px;
+
+    .brand-header {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: var(--text-dim);
     }
-    .weather-info {
+
+    .city-hero {
+      /* 这里的 margin-top 确保它在视觉中心偏上，不再与底部重叠 */
+      margin-top: 60px;
+    }
+
+    .city-hero h1 {
+      font-size: 180px;
+      font-weight: 900;
+      line-height: 0.8;
+      margin: 0;
+      letter-spacing: -10px;
+    }
+
+    .province-tag {
+      font-size: 26px;
+      font-weight: 300;
+      color: var(--text-dim);
+      margin-top: 30px;
+      letter-spacing: 6px;
+    }
+
+    /* 底部更新时间：完全独立定位，防止重叠 */
+    .footer-metadata {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .line-deco {
+      width: 60px;
+      height: 4px;
+      background: var(--theme-blue);
+    }
+
+    .update-time {
+      font-size: 14px;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* 右侧：卡片区 */
+    .right-section {
+      flex: 0.8;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-right: 120px;
+    }
+
+    .weather-card {
+      background: #ffffff;
+      padding: 70px;
+      box-shadow: 50px 50px 100px rgba(0,0,0,0.04);
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .temp-value {
+      font-size: 240px;
+      font-weight: 100;
+      line-height: 0.8;
+      margin-left: -12px;
+      display: flex;
+    }
+
+    .temp-unit {
+      font-size: 45px;
+      margin-top: 25px;
+      font-weight: 400;
+    }
+
+    .weather-desc {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--theme-blue);
+      margin: 20px 0 50px 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 40px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--text-dim);
       margin-bottom: 10px;
     }
-    .source-info {
-      border-top: 1px solid #ddd;
-      margin-top: 12px;
-      padding-top: 12px;
-      font-size: 16px;
-      color: #999;
+
+    .stat-val {
+      font-size: 26px;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
-  <div class="weather-container">
-    <h2>当前天气</h2>
-    
-    <div class="weather-info">
-      <strong>城市:</strong> {{ city }}
+  <div class="color-block"></div>
+
+  <div class="container">
+    <div class="left-section">
+      <div class="brand-header">Weather Intelligence</div>
+      
+      <div class="city-hero">
+        <h1>{{ city }}</h1>
+        <div class="province-tag">{{ province }} / 中国</div>
+      </div>
+
+      <div class="footer-metadata">
+        <div class="line-deco"></div>
+        <div class="update-time">
+          Last Updated<br>
+          <span style="color: var(--text-main); font-weight: 600;">{{ report_time }}</span>
+        </div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 5px;">DATA SRC: AMAP API</div>
+      </div>
     </div>
-    <div class="weather-info">
-      <strong>天气:</strong> {{ desc }}
-    </div>
-    <div class="weather-info">
-      <strong>温度:</strong> {{ temp }}℃ (体感: {{ feels_like }}℃)
-    </div>
-    <div class="weather-info">
-      <strong>湿度:</strong> {{ humidity }}%
-    </div>
-    <div class="weather-info">
-      <strong>风速:</strong> {{ wind_speed }} km/h
-    </div>
-    
-    <div class="source-info">
-      数据来源: 心知天气（Seniverse） 免费API
+
+    <div class="right-section">
+      <div class="weather-card">
+        <div class="temp-value">
+          {{ temp }}<span class="temp-unit">°C</span>
+        </div>
+        <div class="weather-desc">{{ desc }}</div>
+        
+        <div class="stats-grid">
+          <div class="metric">
+            <div class="stat-label">Humidity</div>
+            <div class="stat-val">{{ humidity }}%</div>
+          </div>
+          <div class="metric">
+            <div class="stat-label">Wind Power</div>
+            <div class="stat-val">{{ wind_power }} Level</div>
+          </div>
+          <div class="metric" style="grid-column: span 2;">
+            <div class="stat-label">Wind Direction</div>
+            <div class="stat-val">{{ wind_direction }}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>
@@ -99,76 +233,188 @@ FORECAST_TEMPLATE = """
 <head>
   <meta charset="UTF-8"/>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 1280px;
-      height: 720px;
-      background-color: #fff;
+    :root {
+      --bg-warm: #f2f2ee;       /* 柔砂色 */
+      --accent-block: #e9e9e4;  /* 灰泥色 */
+      --text-main: #1a1a1a;
+      --text-dim: #999990;
+      --theme-blue: #4e6ef2;    
     }
-    .forecast-container {
-      width: 100%;
-      height: 100%;
-      padding: 8px;
+
+    html, body {
+      margin: 0; padding: 0;
+      width: 1280px; height: 720px;
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", sans-serif;
+      overflow: hidden;
+    }
+
+    .container {
+      position: relative;
+      width: 1280px; height: 720px;
+      display: flex;
+      box-sizing: border-box;
+    }
+
+    /* 左侧：画册风格封面区 */
+    .hero-panel {
+      flex: 0.45;
+      padding: 80px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
+      border-right: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .brand-tag {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 10px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .city-info h1 {
+      font-size: 160px;
+      font-weight: 900;
+      line-height: 0.8;
+      margin: 40px 0;
+      letter-spacing: -10px;
+    }
+
+    .forecast-title {
+      font-size: 32px;
+      font-weight: 300;
+      letter-spacing: 5px;
+      color: var(--theme-blue);
+    }
+
+    /* 右侧：交错式数据块 */
+    .data-panel {
+      flex: 0.55;
+      display: flex;
+      flex-direction: column;
+      background: var(--accent-block);
+    }
+
+    .day-row {
+      flex: 1;
+      display: flex;
       align-items: center;
-      background-color: #fff;
-      color: #333;
-      font-family: sans-serif;
-      font-size: 30px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      padding: 0 60px;
+      background: #fff;
+      margin-bottom: 2px; /* 细微缝隙 */
+      transition: all 0.3s;
     }
-    .forecast-container h2 {
-      margin-top: 0;
-      color: #4e6ef2;
-      text-align: center;
-      font-size: 40px;
+
+    /* 奇数行变色，制造节奏感 */
+    .day-row:nth-child(even) {
+      background: #fafafa;
     }
-    .city-info {
-      margin-bottom: 8px;
+
+    .date-column {
+      flex: 0.3;
     }
-    .day-item {
-      margin-bottom: 8px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 4px;
+
+    .date-text {
+      font-size: 48px;
+      font-weight: 800;
+      display: block;
     }
-    .day-title {
-      font-weight: bold;
-      color: #4e6ef2;
-      margin-bottom: 4px;
-    }
-    .source-info {
+
+    .week-text {
       font-size: 16px;
-      color: #999;
-      margin-top: 12px;
-      border-top: 1px solid #ddd;
-      padding-top: 8px;
+      letter-spacing: 3px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .weather-column {
+      flex: 0.4;
+      border-left: 1px solid #eee;
+      padding-left: 40px;
+    }
+
+    .weather-desc {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--theme-blue);
+    }
+
+    .wind-desc {
+      font-size: 16px;
+      color: var(--text-dim);
+      margin-top: 5px;
+    }
+
+    .temp-column {
+      flex: 0.3;
+      text-align: right;
+    }
+
+    .temp-range {
+      font-size: 80px; /* 足够大，手机必看清 */
+      font-weight: 100;
+      letter-spacing: -4px;
+    }
+
+    .temp-range span {
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text-dim);
+      margin-left: 10px;
+    }
+
+    /* 底部修饰 */
+    .footer-stamp {
+      position: absolute;
+      bottom: 40px;
+      left: 80px;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 2px;
     }
   </style>
 </head>
 <body>
-  <div class="forecast-container">
-    <h2>未来{{ total_days }}天天气预报</h2>
-    <div class="city-info">
-      <strong>城市:</strong> {{ city }}
+
+  <div class="container">
+    <div class="hero-panel">
+      <div class="brand-tag">Meteo Report</div>
+      
+      <div class="city-info">
+        <h1>{{ city }}</h1>
+        <div class="forecast-title">未来 {{ total_days }} 日预报</div>
+      </div>
+
+      <div style="height: 100px;"></div> </div>
+
+    <div class="data-panel">
+      {% for day in days %}
+      <div class="day-row">
+        <div class="date-column">
+          <span class="date-text">{{ day.date.split('-')[2] }}</span>
+          <span class="week-text">{{ day.week }}</span>
+        </div>
+        
+        <div class="weather-column">
+          <div class="weather-desc">{{ day.text_day }}</div>
+          <div class="wind-desc">{{ day.day_wind }} · {{ day.day_power }}级</div>
+        </div>
+
+        <div class="temp-column">
+          <div class="temp-range">{{ day.high }}<span>{{ day.low }}°</span></div>
+        </div>
+      </div>
+      {% endfor %}
     </div>
 
-    {% for day in days %}
-    <div class="day-item">
-      <div class="day-title">{{ day.date }}</div>
-      <div><strong>白天:</strong> {{ day.text_day }} — {{ day.high }}℃</div>
-      <div><strong>夜晚:</strong> {{ day.text_night }} — {{ day.low }}℃</div>
-      <div><strong>湿度:</strong> {{ day.humidity }}%  <strong>风速:</strong> {{ day.wind_speed }} km/h</div>
-    </div>
-    {% endfor %}
-
-    <div class="source-info">
-      数据来源: 高德开放平台（Amap） 免费API
+    <div class="footer-stamp">
+      GEN 2026 / ATMOSPHERIC DATA / SOURCE: AMAP OPEN API
     </div>
   </div>
+
 </body>
 </html>
 """
@@ -178,7 +424,7 @@ FORECAST_TEMPLATE = """
     "astrbot_plugin_weather-Amap-mihuc",
     "BB0813",
     "一个基于高德开放平台API的天气查询插件",
-    "1.0.3",
+    "v1.0.4",
     "https://github.com/mihucho/astrbot_plugin_weather-Amap",
 )
 class WeatherPlugin(Star):
@@ -197,6 +443,9 @@ class WeatherPlugin(Star):
         self.default_city = config.get("default_city", "北京")
         # 新增配置项：send_mode，控制发送模式 "image" 或 "text"
         self.send_mode = config.get("send_mode", "image")
+        # 缓存过期时间（秒）：实况天气1小时，预报天气4小时
+        self.current_cache_expire = 3600  # 1小时
+        self.forecast_cache_expire = 14400  # 4小时
         logger.debug(
             f"WeatherPlugin initialized with API key: {self.api_key}, default_city: {self.default_city}, send_mode: {self.send_mode}"
         )
@@ -235,6 +484,7 @@ class WeatherPlugin(Star):
         if data is None:
             yield event.plain_result(f"查询 [{city}] 的当前天气失败，请稍后再试。")
             return
+        
         # 根据配置决定发送模式
         if self.send_mode == "image":
             result_img_url = await self.render_current_weather(data)
@@ -242,11 +492,14 @@ class WeatherPlugin(Star):
         else:
             text = (
                 f"当前天气：\n\n"
+                f"省份: {data['province']}\n\n"
                 f"城市: {data['city']}\n\n"
                 f"天气: {data['desc']}\n\n"
                 f"温度: {data['temp']}℃\n\n"
                 f"湿度: {data['humidity']}%\n\n"
-                f"风速: {data['wind_speed']} km/h"
+                f"风向: {data['wind_direction']}\n\n"
+                f"风力: {data['wind_power']}级\n\n"
+                f"发布时间: {data['report_time']}"
             )
             yield event.plain_result(text)
 
@@ -283,10 +536,9 @@ class WeatherPlugin(Star):
             text = f"未来{len(forecast_data)}天天气预报\n\n城市: {city}\n\n"
             for day in forecast_data:
                 text += (
-                    f"{day['date']}: 白天: {day['text_day']} - {day['high']}℃, "
-                    f"夜晚: {day['text_night']} - {day['low']}℃, "
-                    f"湿度: {day['humidity']}%, "
-                    f"风速: {day['wind_speed']} km/h\n\n"
+                    f"{day['date']} {day['week']}:\n"
+                    f"白天: {day['text_day']} {day['high']}℃ {day['day_wind']}{day['day_power']}级\n"
+                    f"夜晚: {day['text_night']} {day['low']}℃ {day['night_wind']}{day['night_power']}级\n\n"
                 )
             if suggestion_data:
                 text += "生活指数:\n"
@@ -334,11 +586,14 @@ class WeatherPlugin(Star):
         else:
             text = (
                 f"当前天气：\n\n"
+                f"省份: {data['province']}\n\n"
                 f"城市: {data['city']}\n\n"
                 f"天气: {data['desc']}\n\n"
                 f"温度: {data['temp']}℃\n\n"
                 f"湿度: {data['humidity']}%\n\n"
-                f"风速: {data['wind_speed']} km/h"
+                f"风向: {data['wind_direction']}\n\n"
+                f"风力: {data['wind_power']}级\n\n"
+                f"发布时间: {data['report_time']}"
             )
             yield event.plain_result(text)
 
@@ -359,9 +614,6 @@ class WeatherPlugin(Star):
         if not forecast_data:
             yield event.plain_result(f"查询 [{city}] 天气失败，请稍后再试。")
             return
-        
-        # 存储 forecast_data 到 KV
-        await self.put_kv_data(f"{city}_forecast", forecast_data)
         
         # 如果指定了 day，则只返回该天的天气
         if day:
@@ -387,18 +639,16 @@ class WeatherPlugin(Star):
                 if day:
                     # 指定了日期，使用多行格式展示详细信息
                     text += (
-                        f"白天: {day_item['text_day']}  {day_item['high']}℃\n\n"
-                        f"夜晚: {day_item['text_night']}  {day_item['low']}℃\n\n"
-                        f"湿度: {day_item['humidity']}%\n\n"
-                        f"风速: {day_item['wind_speed']} km/h"
+                        f"{day_item['week']}\n\n"
+                        f"白天: {day_item['text_day']}  {day_item['high']}℃  {day_item['day_wind']}{day_item['day_power']}级\n\n"
+                        f"夜晚: {day_item['text_night']}  {day_item['low']}℃  {day_item['night_wind']}{day_item['night_power']}级"
                     )
                 else:
                     # 未指定日期，显示完整的日期前缀
                     text += (
-                        f"{day_item['date']}: 白天: {day_item['text_day']}  {day_item['high']}℃, "
-                        f"夜晚: {day_item['text_night']}  {day_item['low']}℃, "
-                        f"湿度: {day_item['humidity']}%, "
-                        f"风速: {day_item['wind_speed']} km/h\n\n"
+                        f"{day_item['date']} {day_item['week']}:\n"
+                        f"白天: {day_item['text_day']} {day_item['high']}℃ {day_item['day_wind']}{day_item['day_power']}级\n"
+                        f"夜晚: {day_item['text_night']} {day_item['low']}℃ {day_item['night_wind']}{day_item['night_power']}级\n\n"
                     )
             if suggestion_data:
                 text += "\n生活指数:\n\n"
@@ -412,8 +662,23 @@ class WeatherPlugin(Star):
     async def get_current_weather_by_city(self, city: str) -> Optional[dict]:
         """
         调用高德开放平台API，返回城市当前实况
+        缓存策略：实况天气每小时更新多次，缓存1小时
         """
         logger.debug(f"get_current_weather_by_city city={city}")
+        
+        # 检查缓存
+        cache_key = f"{city}_current"
+        cached = await self.get_kv_data(cache_key)
+        
+        if cached and isinstance(cached, dict) and "time" in cached and "data" in cached:
+            # 检查缓存是否过期
+            time_diff = datetime.datetime.now().timestamp() - cached["time"]
+            if time_diff < self.current_cache_expire:
+                logger.debug(f"返回缓存的当前天气数据，剩余有效时间: {self.current_cache_expire - time_diff:.0f}秒")
+                return cached["data"]
+            else:
+                logger.debug(f"缓存已过期 ({time_diff:.0f}秒)，重新获取数据")
+        
         url = "https://restapi.amap.com/v3/weather/weatherInfo"
         params = {"key": self.api_key, "city": city, "extensions": "base"}
         logger.debug(f"Requesting: {url}, params={params}")
@@ -428,17 +693,24 @@ class WeatherPlugin(Star):
                         if not lives:
                             return None
                         now = lives[0]
-                        desc = now.get("weather", "未知")
-                        temp = now.get("temperature", "0")
-                        humidity = now.get("humidity", "0")
-                        wind_speed = now.get("windpower", "0")
-                        return {
-                            "city": city,
-                            "desc": desc,
-                            "temp": temp,
-                            "humidity": humidity,
-                            "wind_speed": wind_speed,
+                        result = {
+                            "province": now.get("province", ""),
+                            "city": now.get("city", city),
+                            "adcode": now.get("adcode", ""),
+                            "desc": now.get("weather", "未知"),
+                            "temp": now.get("temperature", "0"),
+                            "wind_direction": now.get("winddirection", ""),
+                            "wind_power": now.get("windpower", "0"),
+                            "humidity": now.get("humidity", "0"),
+                            "report_time": now.get("reporttime", ""),
                         }
+                        # 存储到缓存
+                        await self.put_kv_data(cache_key, {
+                            "time": datetime.datetime.now().timestamp(),
+                            "data": result
+                        })
+                        logger.debug(f"当前天气数据已缓存，有效期: {self.current_cache_expire}秒")
+                        return result
 
                     else:
                         logger.error(
@@ -453,8 +725,23 @@ class WeatherPlugin(Star):
     async def get_forecast_weather_by_city(self, city: str) -> Optional[List[dict]]:
         """
         调用高德开放平台API，获取未来4天天气预报
+        缓存策略：预报天气每天更新3次（8、11、18点），缓存4小时
         """
         logger.debug(f"get_forecast_weather_by_city city={city}")
+        
+        # 检查缓存
+        cache_key = f"{city}_forecast"
+        cached = await self.get_kv_data(cache_key)
+        
+        if cached and isinstance(cached, dict) and "time" in cached and "data" in cached:
+            # 检查缓存是否过期
+            time_diff = datetime.datetime.now().timestamp() - cached["time"]
+            if time_diff < self.forecast_cache_expire:
+                logger.debug(f"返回缓存的预报天气数据，剩余有效时间: {self.forecast_cache_expire - time_diff:.0f}秒")
+                return cached["data"]
+            else:
+                logger.debug(f"缓存已过期 ({time_diff:.0f}秒)，重新获取数据")
+        
         url = "https://restapi.amap.com/v3/weather/weatherInfo"
         params = {"key": self.api_key, "city": city, "extensions": "all"}
         logger.debug(f"Requesting forecast: {url}, params={params}")
@@ -473,25 +760,26 @@ class WeatherPlugin(Star):
                             return None
                         result = []
                         for day_data in daily_list:
-                            date = day_data.get("date", "1970-01-01")
-                            text_day = day_data.get("dayweather", "未知")
-                            text_night = day_data.get("nightweather", "未知")
-
-                            high = day_data.get("daytemp", "0")
-                            low = day_data.get("nighttemp", "0")
-                            humidity = day_data.get("humidity", "0")
-                            wind_speed = day_data.get("daypower", "0")
                             result.append(
                                 {
-                                    "date": date,
-                                    "text_day": text_day,
-                                    "text_night": text_night,
-                                    "high": high,
-                                    "low": low,
-                                    "humidity": humidity,
-                                    "wind_speed": wind_speed,
+                                    "date": day_data.get("date", "1970-01-01"),
+                                    "week": day_data.get("week", ""),
+                                    "text_day": day_data.get("dayweather", "未知"),
+                                    "text_night": day_data.get("nightweather", "未知"),
+                                    "high": day_data.get("daytemp", "0"),
+                                    "low": day_data.get("nighttemp", "0"),
+                                    "day_wind": day_data.get("daywind", ""),
+                                    "night_wind": day_data.get("nightwind", ""),
+                                    "day_power": day_data.get("daypower", "0"),
+                                    "night_power": day_data.get("nightpower", "0"),
                                 }
                             )
+                        # 存储到缓存
+                        await self.put_kv_data(cache_key, {
+                            "time": datetime.datetime.now().timestamp(),
+                            "data": result
+                        })
+                        logger.debug(f"预报天气数据已缓存，有效期: {self.forecast_cache_expire}秒")
                         return result
                     else:
                         logger.error(
@@ -519,11 +807,14 @@ class WeatherPlugin(Star):
         url = await self.html_render(
             CURRENT_WEATHER_TEMPLATE,
             {
+                "province": data["province"],
                 "city": data["city"],
                 "desc": data["desc"],
                 "temp": data["temp"],
                 "humidity": data["humidity"],
-                "wind_speed": data["wind_speed"],
+                "wind_direction": data["wind_direction"],
+                "wind_power": data["wind_power"],
+                "report_time": data["report_time"],
             },
             return_url=True,
         )
