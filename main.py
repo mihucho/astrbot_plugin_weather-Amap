@@ -39,11 +39,11 @@ CURRENT_WEATHER_TEMPLATE = """
       width: 1280px; height: 720px;
       background-color: var(--bg-warm);
       color: var(--text-main);
-      font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", sans-serif;
+      /* 全局衬线体风格 */
+      font-family: "Georgia", "Times New Roman", "STSong", "Noto Serif SC", "SimSun", serif;
       overflow: hidden;
     }
 
-    /* 右侧背景装饰色块 */
     .color-block {
       position: absolute;
       right: 0; top: 0;
@@ -60,45 +60,45 @@ CURRENT_WEATHER_TEMPLATE = """
       box-sizing: border-box;
     }
 
-    /* 左侧：纯净排版区 */
     .left-section {
       flex: 1.2;
       padding: 80px 100px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between; /* 强制页眉页脚分离 */
+      justify-content: space-between;
     }
 
     .brand-header {
-      font-size: 13px;
+      font-size: 16px;
       font-weight: 700;
-      letter-spacing: 8px;
-      text-transform: uppercase;
+      letter-spacing: 6px;
       color: var(--text-dim);
+      /* 中文主导 */
+      font-family: "STSong", "Noto Serif SC", serif;
     }
 
     .city-hero {
-      /* 这里的 margin-top 确保它在视觉中心偏上，不再与底部重叠 */
       margin-top: 60px;
     }
 
+    /* 【核心修改】飘逸的书法字体 */
     .city-hero h1 {
       font-size: 180px;
-      font-weight: 900;
-      line-height: 0.8;
+      font-weight: 400;
+      line-height: 1;
       margin: 0;
-      letter-spacing: -10px;
+      letter-spacing: 15px;
+      font-family: "Ma Shan Zheng", "STKaiti", "Kaiti", "Microsoft KaiTi", cursive, serif;
     }
 
     .province-tag {
       font-size: 26px;
-      font-weight: 300;
+      font-weight: 400;
       color: var(--text-dim);
-      margin-top: 30px;
-      letter-spacing: 6px;
+      margin-top: 20px;
+      letter-spacing: 8px;
     }
 
-    /* 底部更新时间：完全独立定位，防止重叠 */
     .footer-metadata {
       display: flex;
       flex-direction: column;
@@ -115,10 +115,8 @@ CURRENT_WEATHER_TEMPLATE = """
       font-size: 14px;
       color: var(--text-dim);
       letter-spacing: 2px;
-      text-transform: uppercase;
     }
 
-    /* 右侧：卡片区 */
     .right-section {
       flex: 0.8;
       display: flex;
@@ -137,10 +135,11 @@ CURRENT_WEATHER_TEMPLATE = """
 
     .temp-value {
       font-size: 240px;
-      font-weight: 100;
+      font-weight: 400;
       line-height: 0.8;
       margin-left: -12px;
       display: flex;
+      font-family: "Georgia", serif; /* 衬线体数字更具美感 */
     }
 
     .temp-unit {
@@ -150,31 +149,33 @@ CURRENT_WEATHER_TEMPLATE = """
     }
 
     .weather-desc {
-      font-size: 48px;
-      font-weight: 800;
+      font-size: 52px;
+      font-weight: 900;
       color: var(--theme-blue);
-      margin: 20px 0 50px 0;
+      margin: 30px 0 50px 0;
+      letter-spacing: 4px;
     }
 
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 40px;
-      border-top: 1px solid #f0f0f0;
+      border-top: 1px dotted #ccc; /* 改为虚线更显精致 */
       padding-top: 40px;
     }
 
     .stat-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 3px;
+      font-size: 13px;
+      letter-spacing: 2px;
       color: var(--text-dim);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      font-weight: 600;
     }
 
     .stat-val {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 600;
+      font-family: "Georgia", "STSong", serif;
     }
   </style>
 </head>
@@ -183,20 +184,19 @@ CURRENT_WEATHER_TEMPLATE = """
 
   <div class="container">
     <div class="left-section">
-      <div class="brand-header">Weather Intelligence</div>
+      <div class="brand-header">气象监测系统 / WEATHER INTEL</div>
       
       <div class="city-hero">
         <h1>{{ city }}</h1>
-        <div class="province-tag">{{ province }} / 中国</div>
+        <div class="province-tag">{{ province }} · 中国</div>
       </div>
 
       <div class="footer-metadata">
         <div class="line-deco"></div>
         <div class="update-time">
-          Last Updated<br>
-          <span style="color: var(--text-main); font-weight: 600;">{{ report_time }}</span>
+          最后更新时间 / DATA SRC<br>
+          <span style="color: var(--text-main); font-weight: 600; font-family: 'Georgia';">{{ report_time }} (AMAP)</span>
         </div>
-        <div style="font-size: 11px; color: var(--text-dim); margin-top: 5px;">DATA SRC: AMAP API</div>
       </div>
     </div>
 
@@ -209,15 +209,15 @@ CURRENT_WEATHER_TEMPLATE = """
         
         <div class="stats-grid">
           <div class="metric">
-            <div class="stat-label">Humidity</div>
+            <div class="stat-label">空气湿度</div>
             <div class="stat-val">{{ humidity }}%</div>
           </div>
           <div class="metric">
-            <div class="stat-label">Wind Power</div>
-            <div class="stat-val">{{ wind_power }} Level</div>
+            <div class="stat-label">风力等级</div>
+            <div class="stat-val">{{ wind_power }} 级</div>
           </div>
           <div class="metric" style="grid-column: span 2;">
-            <div class="stat-label">Wind Direction</div>
+            <div class="stat-label">风向</div>
             <div class="stat-val">{{ wind_direction }}</div>
           </div>
         </div>
@@ -247,7 +247,8 @@ FORECAST_TEMPLATE = """
       width: 1280px; height: 720px;
       background-color: var(--bg-warm);
       color: var(--text-main);
-      font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", sans-serif;
+      /* 修改点：全局采用衬线体组合，增加画册质感 */
+      font-family: "Georgia", "Times New Roman", "STSong", "Noto Serif SC", "SimSun", serif;
       overflow: hidden;
     }
 
@@ -259,68 +260,70 @@ FORECAST_TEMPLATE = """
       justify-content: space-between; border-right: 1px solid rgba(0,0,0,0.05);
       background: var(--bg-warm);
     }
-    .city-info h1 { font-size: 160px; font-weight: 900; line-height: 0.8; margin: 40px 0; letter-spacing: -10px; }
+    .brand-tag { font-size: 14px; font-weight: 700; letter-spacing: 8px; color: var(--text-dim); }
+    
+    /* 修改点：城市名使用飘逸的书法/楷体系列，并微调字间距 */
+    .city-info h1 { 
+      font-size: 160px; 
+      font-weight: 400; 
+      line-height: 1; 
+      margin: 40px 0; 
+      letter-spacing: 10px; 
+      font-family: "Ma Shan Zheng", "STKaiti", "Kaiti", "Microsoft KaiTi", cursive, serif;
+    }
+    
     .forecast-title { font-size: 32px; font-weight: 300; letter-spacing: 5px; color: var(--theme-blue); }
 
     /* --- 右侧数据面板 --- */
     .data-panel { flex: 0.6; display: flex; flex-direction: column; background: var(--accent-block); }
 
-    /* --- 多日列表：大而轻盈的日期结构 --- */
+    /* --- 多日列表 --- */
     .day-row {
       flex: 1; display: flex; align-items: center; justify-content: space-between;
       padding: 0 45px; background: #fff; margin-bottom: 2px;
     }
     .day-row:nth-child(even) { background: #fafafa; }
 
-    /* 白天 */
     .day-part { flex: 1; display: flex; flex-direction: column; align-items: flex-start; }
-    .day-part .temp { font-size: 56px; font-weight: 100; color: var(--theme-blue); line-height: 0.9; }
-    .day-part .desc { font-size: 24px; font-weight: 800; color: var(--theme-blue); margin-top: 8px; }
-    .day-part .wind { font-size: 12px; color: var(--text-dim); text-transform: uppercase; margin-top: 2px; }
+    /* 数字使用衬线体 Georgia 极其优美 */
+    .day-part .temp { font-size: 56px; font-weight: 400; color: var(--theme-blue); line-height: 0.9; font-family: "Georgia", serif; }
+    .day-part .desc { font-size: 24px; font-weight: 700; color: var(--theme-blue); margin-top: 8px; }
+    .day-part .wind { font-size: 13px; color: var(--text-dim); margin-top: 2px; letter-spacing: 1px; }
 
-    /* 中间日期：优化后的“通透大字” (48px) */
-    .date-mid {
-      flex: 0.8; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 0 20px;
-    }
-    .date-text { 
-      font-size: 56px; 
-      font-weight: 900; 
-      color: rgba(0,0,0,0.6); /* 使用极浅的颜色，保证大而不突兀 */
-      letter-spacing: -2px;
-      line-height: 0.9;
-    }
-    .week-text { 
-      font-size: 20px; 
-      letter-spacing: 6px; 
-      color: var(--text-dim); 
-      font-weight: 700; 
-      text-transform: uppercase; 
-      margin-top: 8px;
-    }
+    .date-mid { flex: 0.8; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .date-text { font-size: 56px; font-weight: 900; color: rgba(0,0,0,0.6); letter-spacing: -1px; line-height: 0.9; font-family: "Georgia", serif; }
+    .week-text { font-size: 24px; letter-spacing: 4px; color: var(--text-dim); font-weight: 600; margin-top: 8px; }
 
-    /* 夜晚 */
     .night-part { flex: 1; display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
-    .night-part .temp { font-size: 48px; font-weight: 400; color: var(--text-main); line-height: 0.9; }
+    .night-part .temp { font-size: 48px; font-weight: 400; color: var(--text-main); line-height: 0.9; font-family: "Georgia", serif; }
     .night-part .desc { font-size: 22px; font-weight: 700; color: var(--text-main); margin-top: 8px; }
-    .night-part .wind { font-size: 12px; color: var(--text-dim); text-transform: uppercase; margin-top: 2px; }
+    .night-part .wind { font-size: 13px; color: var(--text-dim); margin-top: 2px; letter-spacing: 1px; }
 
-    /* --- 单日模式 (补全风力) --- */
+    /* --- 单日模式 --- */
     .single-wrapper { flex: 1; display: flex; gap: 2px; }
     .period-box { flex: 1; padding: 60px 45px; display: flex; flex-direction: column; justify-content: space-between; }
     .day-box { background: #fff; }
     .night-box { background: var(--night-deep); color: #fff; }
-    .temp-big { font-size: 180px; font-weight: 100; line-height: 0.8; margin-top: 20px; }
-    .bottom-info { font-size: 14px; letter-spacing: 3px; opacity: 0.5; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 15px; margin-top: 20px; text-transform: uppercase;}
 
-    .footer-stamp { position: absolute; bottom: 40px; left: 80px; font-size: 11px; color: var(--text-dim); letter-spacing: 2px; }
+    .cn-label { font-size: 40px; font-weight: 900; letter-spacing: 2px; display: block; }
+    .en-sub-label { font-size: 12px; font-weight: 400; letter-spacing: 4px; opacity: 0.4; text-transform: uppercase; margin-top: 4px; display: block; }
+    
+    .temp-big { font-size: 180px; font-weight: 400; line-height: 0.8; margin-top: 30px; font-family: "Georgia", serif; }
+    
+    .bottom-info { 
+      font-size: 15px; letter-spacing: 2px; font-weight: 600;
+      border-top: 1px solid rgba(0,0,0,0.05); padding-top: 15px; margin-top: 20px; 
+    }
+    .night-box .bottom-info { border-top: 1px solid rgba(255,255,255,0.1); opacity: 0.7; }
+
+    .footer-stamp { position: absolute; bottom: 40px; left: 80px; font-size: 11px; color: var(--text-dim); letter-spacing: 2px; font-family: sans-serif; }
   </style>
 </head>
 <body>
 
   <div class="container">
     <div class="hero-panel">
-      <div class="brand-tag">Meteo Report</div>
+      <div class="brand-tag">WEATHER REPORT</div>
       <div class="city-info">
         <h1>{{ city }}</h1>
         <div class="forecast-title">
@@ -336,21 +339,27 @@ FORECAST_TEMPLATE = """
         <div class="single-wrapper">
           <div class="period-box day-box">
             <div>
-              <div style="width:40px;height:40px;border:2.5px solid var(--theme-blue);border-radius:50%;margin-bottom:25px;"></div>
-              <span style="font-size:36px;font-weight:800;color:var(--theme-blue);">DAYTIME</span>
-              <div style="font-size:32px;font-weight:700;margin-top:10px;">{{ d.text_day }}</div>
+              <div style="width:35px;height:35px;border:3px solid var(--theme-blue);border-radius:50%;margin-bottom:20px;"></div>
+              <span class="cn-label" style="color:var(--theme-blue);">日间天气</span>
+              <span class="en-sub-label" style="color:var(--theme-blue);">Daytime Observation</span>
+              <div style="font-size:32px;font-weight:700;margin-top:15px;">{{ d.text_day }}</div>
               <div class="temp-big" style="color:var(--theme-blue);">{{ d.high }}°</div>
             </div>
-            <div class="bottom-info" style="color: var(--text-main);">Wind Velocity / {{ d.day_wind }} {{ d.day_power }}级</div>
+            <div class="bottom-info" style="color: var(--text-main);">
+              {{ d.day_wind }} {{ d.day_power }}级
+            </div>
           </div>
           <div class="period-box night-box">
             <div>
-              <div style="width:40px;height:40px;border-radius:50%;box-shadow:8px 8px 0 0 #fff;margin-bottom:25px;"></div>
-              <span style="font-size:36px;font-weight:800;opacity:0.7;">NIGHTFALL</span>
-              <div style="font-size:32px;font-weight:700;margin-top:10px;">{{ d.text_night }}</div>
+              <div style="width:35px;height:35px;border-radius:50%;box-shadow:7px 7px 0 0 #fff;margin-bottom:20px;"></div>
+              <span class="cn-label">夜间天气</span>
+              <span class="en-sub-label">Nightfall Observation</span>
+              <div style="font-size:32px;font-weight:700;margin-top:15px;">{{ d.text_night }}</div>
               <div class="temp-big">{{ d.low }}°</div>
             </div>
-            <div class="bottom-info">Atmospheric / {{ d.night_wind }} {{ d.night_power }}级</div>
+            <div class="bottom-info">
+              {{ d.night_wind }} {{ d.night_power }}级
+            </div>
           </div>
         </div>
       {% else %}
@@ -377,7 +386,7 @@ FORECAST_TEMPLATE = """
       {% endif %}
     </div>
 
-    <div class="footer-stamp">GEN 2026 / ATMOSPHERIC DATA / AMAP API</div>
+    <div class="footer-stamp">GENERATED 2026 / 气象数据来源于高德地图 API</div>
   </div>
 
 </body>
